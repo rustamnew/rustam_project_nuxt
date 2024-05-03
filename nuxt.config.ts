@@ -1,5 +1,22 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    $production: {
+        runtimeConfig: {
+            public: {
+                apiUrl: 'https://api.rustamproject.ru',
+                // mode: 'production',
+            },
+        },
+    },
+    $development: {
+        runtimeConfig: {
+            public: {
+                apiUrl: 'http://localhost:3001',
+                // mode: 'development',
+            },
+        },
+    },
+
     // ssr: false,
     // sourcemap: false,
     // devtools: { enabled: true },

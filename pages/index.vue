@@ -13,5 +13,8 @@ definePageMeta({
         Главная
     </h1>
 
+    <p class="text-lg mb-8">
+        Скоро тут будет контент, а пока что, посетите другие страницы
+    </p>
     <CodeBlock />
 </template>

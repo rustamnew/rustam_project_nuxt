@@ -41,6 +41,7 @@ export default {
                 h3: [remFromPx(24), remFromPx(28)],
                 h3_mobile: [remFromPx(20), remFromPx(24)],
                 h1: [remFromPx(80), remFromPx(90)],
+                h1_mobile: [remFromPx(64), remFromPx(74)],
                 h2: [remFromPx(54), remFromPx(70)],
                 logo: [remFromPx(28), remFromPx(28)],
             },

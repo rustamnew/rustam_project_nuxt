@@ -3,12 +3,12 @@ import { useStorage } from '@vueuse/core'
 import { useDataStore } from '../store/data'
 import { useAuthStore } from '../store/auth'
 
-const URL = 'http://localhost:3001'
-
 export async function useData(data_type, action_type = 'get'/* , value = '' */, save_value) {
     const dataStore = useDataStore()
     const authStore = useAuthStore()
 
+    const runtimeConfig = useRuntimeConfig()
+    const URL = runtimeConfig.public.apiUrl
     const token = useCookie('access_token')
 
     let return_value = []

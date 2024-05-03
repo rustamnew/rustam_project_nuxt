@@ -88,8 +88,8 @@ function removeItem() {
 
         <div class="flex flex-col mb-5">
             <q-checkbox
-                v-for="step, index in item.steps"
-                :key="index"
+                v-for="step, stepIndex in item.steps"
+                :key="stepIndex"
                 v-model="step.checked"
                 :label="step.title"
                 class="q-custom-checkbox"
