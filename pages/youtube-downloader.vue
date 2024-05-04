@@ -6,7 +6,17 @@ definePageMeta({
     layout: 'default',
     name: 'Скачать видео',
     order: 2,
+    globalMenu: false,
 })
+
+const formatOptions = [
+    '360p',
+    '4800p',
+    '720p',
+    '1080p',
+]
+
+const format = ref(null)
 </script>
 
 <template>
@@ -15,5 +25,9 @@ definePageMeta({
             Скачать видео с YouTube
         </h3>
         <q-input label="URL" />
+
+        <q-select v-model="format" :options="formatOptions" label="Формат" class="mb-4" />
+
+        <q-btn color="primary" label="Скачать" class="mb-5" />
     </div>
 </template>
