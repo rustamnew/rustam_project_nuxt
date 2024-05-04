@@ -26,7 +26,7 @@ export async function useData(data_type, action_type = 'get'/* , value = '' */, 
             body: action_type === 'save' ? save_value : null,
         }
 
-        response = await $fetch(`${URL}/api/${action_type}/user/${data_type}`, params) // example: GET http://localhost:3001/api/get/user/todo
+        response = await $fetch(`${URL}/api/${action_type}/${data_type}`, params) // example: GET http://localhost:3001/api/get/user/todo
 
         if (response[data_type]) {
             dataStore.data[data_type] = response[data_type]

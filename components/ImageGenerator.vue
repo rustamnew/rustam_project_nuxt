@@ -1,6 +1,4 @@
 <script setup>
-import { Loading } from 'quasar'
-
 const imageStyleOptions = [
     {
         label: 'По умолчанию',
@@ -28,8 +26,15 @@ const imageWidth = ref(imageMaxSize)
 const imageHeight = ref(imageMaxSize)
 
 const imageSrc = ref(null)
+const imageName = ref(null)
 
 const loading = ref(false)
+const preview_element = ref(null)
+const preview_scale = ref(2) // Важно, начальное значение = 2 (для десктопа)
+
+const runtimeConfig = useRuntimeConfig()
+const URL = runtimeConfig.public.apiUrl
+const needCalculate = ref(false)
 
 async function onSubmit() {
     if (!imagePrompt.value) {
@@ -38,7 +43,7 @@ async function onSubmit() {
     }
 
     loading.value = true
-    const response = await $fetch('http://localhost:3001/api/generator', {
+    const response = await $fetch(`${URL}/api/generator`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -55,8 +60,25 @@ async function onSubmit() {
 
     loading.value = false
 
-    imageSrc.value = `http://localhost:3001/${response.image_link}` // пихнуть в пользовательские данные в сторе в галерею
+    imageSrc.value = `${URL}/${response.image_link}` // пихнуть в пользовательские данные на беке
+    imageName.value = `${response.image_link.split('/').pop()}`
 }
+
+function checkPreviewSize(rendered_width) {
+    const width = imageWidth.value
+
+    if (width > rendered_width)
+        preview_scale.value = width / rendered_width
+}
+
+onMounted(() => {
+    const rendered_width = preview_element.value.clientWidth
+
+    if (rendered_width < (imageMaxSize / preview_scale.value)) {
+        needCalculate.value = true
+        checkPreviewSize(rendered_width)
+    }
+})
 </script>
 
 <template>
@@ -77,6 +99,7 @@ async function onSubmit() {
                 :min="0"
                 :step="4"
                 :max="1024"
+                @update:model-value="needCalculate ? checkPreviewSize() : null"
             />
 
             <span class="block mb-4">Ширина: {{ imageWidth }}</span>
@@ -90,19 +113,25 @@ async function onSubmit() {
 
             <span class="block mb-4">Высота: {{ imageHeight }}</span>
 
-            <q-btn label="Отправить" type="submit" color="primary" />
+            <q-btn label="Создать" type="submit" color="primary" />
         </q-form>
 
-        <div class="bg-gray flex items-center justify-center mx-auto" :style="`height: ${imageHeight / 2}px; width: ${imageWidth / 2}px`">
+        <div ref="preview_element" class="bg-gray flex items-center justify-center mx-auto max-w-full" :style="`height: ${imageHeight / preview_scale}px; width: ${imageWidth / preview_scale}px`">
             <span v-if="!loading && !imageSrc" class="text-xl text-darkgray">Предпросмотр</span>
 
             <q-img v-if="!loading && imageSrc" :src="imageSrc" fit="contain" class="max-h-full max-w-full" />
+
+            <q-spinner
+                v-if="loading && !imageSrc"
+                color="primary"
+                size="3em"
+            />
         </div>
     </div>
 
     <div v-if="imageSrc" class="flex flex-col mt-5">
-        <q-btn :href="imageSrc" target="_blank" size="xl" label="Скачать" class="mb-5" />
+        <q-btn :download="imageName" :href="imageSrc" target="_blank" size="xl" label="Скачать" class="mb-5" />
 
-        <q-btn :href="imageSrc" target="_blank" size="xl" label="Создать ещё" />
+        <q-btn target="_blank" size="xl" label="Создать ещё" @click="imageSrc = null" />
     </div>
 </template>
