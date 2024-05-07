@@ -12,21 +12,19 @@ async function checkAuthToken() {
     const router = useRouter()
 
     const token = useCookie('access_token')
-    const user = useStorage('user')
 
     loading.value = true
 
-    if (user.value) {
-        authStore.user = JSON.parse(user.value)
-        authStore.authenticated = true
-    }
-
     if (token.value) {
-        authStore.access_token = token.value
         const response = await useAuth()
 
-        if (response && (response.name && !response.name.includes('Error')) && route.path === '/auth')
-            router.push({ path: '/' })
+        if (response.id) { // Если пришёл объект с пользователем
+            authStore.access_token = token.value
+            authStore.authenticated = true
+
+            if (route.path === '/auth')
+                router.push({ path: '/' })
+        }
     }
 
     loading.value = false

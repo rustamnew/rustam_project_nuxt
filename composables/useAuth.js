@@ -64,7 +64,7 @@ export async function useAuth(formData, actionType = 'login', exit = false, noti
         }
         catch (error) {
             if (notification)
-                useNotification(alerts[3])
+                useNotification(alerts[0])
 
             return false
         }

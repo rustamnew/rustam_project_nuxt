@@ -63,7 +63,7 @@ export async function useData(data_type, action_type = 'get'/* , value = '' */, 
         if (Object.keys(dataStore.data[data_type]).length === 0 && authStore.authenticated)
             return_value = await fetchData(data_type, action_type)
 
-        else if (Object.keys(dataStore.data[data_type]).length === 0 && authStore.guest)
+        else if (Object.keys(dataStore.data[data_type]).length === 0)
             return_value = storageData(data_type, action_type)
 
         else
@@ -74,11 +74,12 @@ export async function useData(data_type, action_type = 'get'/* , value = '' */, 
         if (authStore.authenticated)
             return_value = await fetchData(data_type, action_type)
 
-        else if (authStore.guest)
+        else // if (authStore.guest)
             return_value = storageData(data_type, action_type)
-
+        /*
         else
             return_value = dataStore.data[data_type]
+        */
     }
 
     if (return_value)

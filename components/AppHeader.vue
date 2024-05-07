@@ -39,9 +39,9 @@ function logout() {
             size="3em"
         />
         <h3 v-else class="text-xl max-w-[25%] overflow-hidden text-ellipsis">
-            {{ authStore.guest ? 'Гость' : authStore.user.username }}
+            <!-- {{ authStore.guest ? 'Гость' : authStore.user.username }} -->
+            {{ authStore.user.username ? authStore.user.username : 'Гость' }}
         </h3>
-
         <div class="w-2/5 flex justify-end">
             <NuxtLink v-if="!authStore.authenticated" to="/auth" class="ml-6">
                 <q-btn color="primary" class="rounded-lg " text-color="white" label="Войти" />

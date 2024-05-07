@@ -3,7 +3,8 @@ export default defineNuxtConfig({
     $production: {
         runtimeConfig: {
             public: {
-                apiUrl: 'https://api.rustamproject.ru',
+                apiUrl: '', // Редирект через apache
+                // apiUrl: 'https://api.rustamproject.ru',
                 // mode: 'production',
             },
         },

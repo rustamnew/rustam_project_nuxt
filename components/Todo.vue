@@ -27,7 +27,7 @@ function removeItem(index) {
 }
 
 async function saveTodo(item, index) {
-    if (item && item.id === -1 && authStore.guest === true) {
+    if (item && item.id === -1 && authStore.authenticated === false) {
         item.id = todo.value.length + 1
         todo.value[index] = item
     }
@@ -39,21 +39,37 @@ async function saveTodo(item, index) {
 
     useNotification(alerts[0])
 }
+
+// Ожидание прогрузки, чтобы избежать временно пустого списка
+const todoLoaded = ref(false)
+onMounted(() => {
+    todoLoaded.value = true
+})
 </script>
 
 <template>
-    <div class="flex justify-center">
-        <TodoItem
-            v-for="item, index in todo"
-            :key="index"
-            :item-prop="item"
-            :index="index"
-            @save="saveTodo($event, index)"
-            @remove="removeItem(index)"
-        />
+    <q-spinner
+        v-if="todoLoaded === false"
+        color="primary"
+        size="3em"
+        class=""
+    />
 
-        <span v-if="!todo.length" class="empty">Нет задач</span>
-    </div>
+    <template v-if="todoLoaded === true">
+        <div class="flex justify-center">
+            <TodoItem
 
-    <q-btn label="Добавить задачу" color="positive" text-color="white" class="mt-5 mx-auto" @click="addTodoItem()" />
+                v-for="item, index in todo"
+                :key="index"
+                :item-prop="item"
+                :index="index"
+                @save="saveTodo($event, index)"
+                @remove="removeItem(index)"
+            />
+
+            <span v-if="!todo.length" class="empty">Нет задач</span>
+        </div>
+
+        <q-btn label="Добавить задачу" color="positive" text-color="white" class="mt-5 mx-auto" @click="addTodoItem()" />
+    </template>
 </template>

@@ -1,4 +1,8 @@
 <script setup>
+const alerts = [
+    { message: 'Ошибка создания изображения', bgColor: 'red', position: 'bottom-right' },
+]
+
 const imageStyleOptions = [
     {
         label: 'По умолчанию',
@@ -43,25 +47,30 @@ async function onSubmit() {
     }
 
     loading.value = true
-    const response = await $fetch(`${URL}/api/generator`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            prompt: imagePrompt.value,
-            style: imageStyle.value.value,
-            width: imageWidth.value,
-            height: imageHeight.value,
-            // ...formData,
-        }),
-    })
 
-    loading.value = false
+    try {
+        const response = await $fetch(`${URL}/api/generator`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: imagePrompt.value,
+                style: imageStyle.value.value,
+                width: imageWidth.value,
+                height: imageHeight.value,
+                // ...formData,
+            }),
+        })
+        loading.value = false
 
-    imageSrc.value = `${URL}/${response.image_link}` // пихнуть в пользовательские данные на беке
-    imageName.value = `${response.image_link.split('/').pop()}`
+        imageSrc.value = `${URL}/${response.image_link}` // пихнуть в пользовательские данные на беке
+        imageName.value = `${response.image_link.split('/').pop()}`
+    }
+    catch (error) {
+        useNotification(alerts[0])
+    }
 }
 
 function checkPreviewSize(rendered_width) {
