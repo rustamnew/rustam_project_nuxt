@@ -1,4 +1,3 @@
-import { useStorage } from '@vueuse/core'
 import { useAuthStore } from '../store/auth'
 import { useNotification } from './useNotification'
 
@@ -17,8 +16,6 @@ export async function useAuth(formData, actionType = 'login', exit = false, noti
 
     const authStore = useAuthStore()
     const token = useCookie('access_token')
-
-    const userCache = useStorage('user')
 
     async function auth(token = false) {
         let userObj = {}
@@ -60,7 +57,6 @@ export async function useAuth(formData, actionType = 'login', exit = false, noti
             authStore.guest = false
             authStore.authenticated = true
             authStore.access_token = response.access_token
-            userCache.value = JSON.stringify(userObj)
         }
         catch (error) {
             if (notification)

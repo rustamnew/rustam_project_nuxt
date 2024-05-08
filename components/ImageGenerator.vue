@@ -40,6 +40,10 @@ const runtimeConfig = useRuntimeConfig()
 const URL = runtimeConfig.public.apiUrl
 const needCalculate = ref(false)
 
+/* function correctedPromptString() {
+    return imagePrompt.value.replaceAll(/\s/g, ' ').replaceAll('  ', ' ')
+} */
+
 async function onSubmit() {
     if (!imagePrompt.value) {
         promptInput.value.focus()
@@ -56,20 +60,23 @@ async function onSubmit() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                prompt: imagePrompt.value,
+                // prompt: correctedPromptString(),
+                prompt: imagePrompt.value.trim(),
                 style: imageStyle.value.value,
                 width: imageWidth.value,
                 height: imageHeight.value,
                 // ...formData,
             }),
         })
-        loading.value = false
 
-        imageSrc.value = `${URL}/${response.image_link}` // пихнуть в пользовательские данные на беке
+        imageSrc.value = `${URL || 'https://api.rustamproject.ru/'}/${response.image_link}` // пихнуть в пользовательские данные на беке
         imageName.value = `${response.image_link.split('/').pop()}`
     }
     catch (error) {
         useNotification(alerts[0])
+    }
+    finally {
+        loading.value = false
     }
 }
 
@@ -97,7 +104,6 @@ onMounted(() => {
                 ref="promptInput"
                 v-model="imagePrompt"
                 filled
-                type="textarea"
                 label="Промпт"
             />
 
@@ -122,7 +128,7 @@ onMounted(() => {
 
             <span class="block mb-4">Высота: {{ imageHeight }}</span>
 
-            <q-btn label="Создать" type="submit" color="primary" />
+            <q-btn label="Создать" type="submit" color="primary" :disabled="loading ? true : false" />
         </q-form>
 
         <div ref="preview_element" class="bg-gray flex items-center justify-center mx-auto max-w-full" :style="`height: ${imageHeight / preview_scale}px; width: ${imageWidth / preview_scale}px`">
