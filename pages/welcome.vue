@@ -13,11 +13,6 @@ definePageMeta({
 // TODO: перевод в зависимости от языка системы
 // TODO: android приложение
 // TODO: Анимации ?
-
-onMounted(() => {
-    const welcomeVisited = useCookie('welcome_visited')
-    welcomeVisited.value = true
-})
 </script>
 
 <template>
