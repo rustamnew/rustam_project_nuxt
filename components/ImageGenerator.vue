@@ -1,4 +1,6 @@
 <script setup>
+defineEmits(['created'])
+
 const alerts = [
     { message: 'Ошибка создания изображения', bgColor: 'red', position: 'bottom-right' },
 ]
@@ -136,17 +138,19 @@ onMounted(() => {
 
             <q-img v-if="!loading && imageSrc" :src="imageSrc" fit="contain" class="max-h-full max-w-full" />
 
-            <q-spinner
-                v-if="loading && !imageSrc"
-                color="primary"
-                size="3em"
-            />
+            <div v-if="loading && !imageSrc" class="flex flex-col items-center">
+                <q-spinner
+                    color="primary"
+                    size="3em"
+                />
+                <span class="block mt-4 text-base">Идёт генерация</span>
+            </div>
         </div>
     </div>
 
     <div v-if="imageSrc" class="flex flex-col mt-5">
         <q-btn :download="imageName" :href="imageSrc" target="_blank" size="xl" label="Скачать" class="mb-5" />
 
-        <q-btn target="_blank" size="xl" label="Создать ещё" @click="imageSrc = null" />
+        <q-btn target="_blank" size="xl" label="Создать ещё" @click="imageSrc = null; $emit('created')" />
     </div>
 </template>

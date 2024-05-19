@@ -8,8 +8,15 @@ definePageMeta({
     middleware: 'auth',
     order: 3,
 })
+
+const generations = ref(await useData('generations', 'get'))
+
+async function updateGallery() {
+    generations.value = await useData('generations', 'get')
+}
 </script>
 
 <template>
-    <ImageGenerator />
+    <ImageGenerator @created="updateGallery()" />
+    <ImageGallery class-name="mt-10" :items="generations" />
 </template>
