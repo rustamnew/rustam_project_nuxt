@@ -17,7 +17,7 @@ onMounted(() => {
 <template>
     <div class="w-full flex flex-col items-center" :class="className">
         <!-- Убарть класс text-h3 из tailwind конфига, он перекрывает quasar'овский -->
-        <h3 v-if="items" class="text-h3 mb-4">
+        <h3 v-if="items && items.length" class="text-h3 mb-4">
             Галерея
         </h3>
 
