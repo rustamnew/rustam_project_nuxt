@@ -14,7 +14,6 @@ export async function useData(data_type, action_type = 'get'/* , value = '' */, 
     let return_value = []
 
     async function fetchData() {
-        let response = null
 
         const params = {
             method: action_type === 'get' ? 'GET' : 'POST',
@@ -26,7 +25,10 @@ export async function useData(data_type, action_type = 'get'/* , value = '' */, 
         }
 
         try {
-            response = await $fetch(`${URL}/api/${action_type}/${data_type}`, params) // example: GET http://localhost:3001/api/get/todo
+            if (!token.value)
+                throw new TypeError('no access token')
+
+            const response = await $fetch(`${URL}/api/${action_type}/${data_type}`, params) // example: GET http://localhost:3001/api/get/todo
 
             if (response[data_type]) {
                 dataStore.data[data_type] = response[data_type]

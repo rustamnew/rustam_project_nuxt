@@ -15,21 +15,23 @@ export async function useAuth(formData, actionType = 'login', exit = false, noti
     const URL = runtimeConfig.public.apiUrl
 
     const authStore = useAuthStore()
+
+    const username = useCookie('username')
     const token = useCookie('access_token')
 
-    async function auth(token = false) {
+    async function auth(byToken = false) {
         let userObj = {}
 
-        try {
+        try { // Улучшить код
             let response
 
-            if (token && !formData) {
-                response = await $fetch(`${URL}/api/get/user`, { // DO LOGIN FIRST!
+            if (byToken && !formData) {
+                response = await $fetch(`${URL}/api/get/user`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
-                        'custom_header_for_token': token,
+                        'custom_header_for_token': token.value,
                     },
                 })
 
@@ -62,12 +64,19 @@ export async function useAuth(formData, actionType = 'login', exit = false, noti
             if (notification)
                 useNotification(alerts[0])
 
+            if (byToken)
+                clearCookies()
+
             return false
         }
 
         return userObj
     }
 
+    function clearCookies() {
+        token.value = null
+        username.value = null
+    }
     function guestLogin() {
         authStore.guest = true
         authStore.authenticated = false
@@ -78,9 +87,9 @@ export async function useAuth(formData, actionType = 'login', exit = false, noti
         authStore.user = {}
         authStore.access_token = null
         authStore.authenticated = false
-        token.value = ''
         authStore.guest = false
-        userCache.value = null
+
+        clearCookies()
     }
 
     let response = false
@@ -90,7 +99,7 @@ export async function useAuth(formData, actionType = 'login', exit = false, noti
     else if (formData && formData.username === 'guest')
         response = guestLogin()
     else if (token.value && actionType !== 'register')
-        response = auth(token.value)
+        response = auth(true)
     else
         response = auth()
 
