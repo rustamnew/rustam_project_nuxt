@@ -9,7 +9,7 @@ const dataStore = useDataStore()
 
     <PageMenu />
 
-    <div class="main relative p-10">
+    <div class="main relative p-5 lg:p-10">
         <slot />
 
         <q-spinner

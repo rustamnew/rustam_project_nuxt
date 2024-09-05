@@ -18,12 +18,6 @@ const error = ref({
     showError: false,
 })
 
-watch(props, (newProps) => {
-    item.value = JSON.parse(JSON.stringify(newProps.itemProp))
-    itemDefault.value = JSON.parse(JSON.stringify(newProps.itemProp))
-    editMode.value = false
-})
-
 function allEmptyCheck() {
     const allEmpty = !item.value.title && !item.value.text && !item.value.steps.length
     return allEmpty
@@ -74,17 +68,95 @@ function confirmRemoveItem() {
 function removeItem() {
     emit('remove')
 }
+
+// Поиск и замена ссылок в тексте на <a href=..></a>
+function findLinks(string) {
+    console.log(string)
+    const res = [...string.matchAll(/https?:\/\/[^\s]*/g)]
+
+    if (!res.length)
+        return string
+
+    let newString = string
+
+    res.forEach((item) => {
+        const text = item[0]
+        // const textLength = text.length
+        // const indexTextStart = item.index
+        // const indexTextEnd = indexTextStart + textLength
+        const linkElement = `<a href="${text}" target="_blank">${text}</a>`
+
+        newString = newString.replace(text, linkElement)
+    })
+
+    return newString
+}
+
+// Отслеживание обновления пропсов
+watch(props, (newProps) => {
+    item.value = JSON.parse(JSON.stringify(newProps.itemProp))
+    itemDefault.value = JSON.parse(JSON.stringify(newProps.itemProp))
+    editMode.value = false
+})
+
+const itemSizeLabel = computed(() => {
+    let label = ''
+
+    switch (item.value.size) {
+        case 2:
+            label = 'Большой'
+            break
+        case 1:
+            label = 'Средний'
+            break
+        case 0:
+            label = 'Малый'
+            break
+        default:
+            label = 'Малый'
+            break
+    }
+
+    return label
+})
+
+const highlightedLinks = computed(() => {
+    let string = item.value.text
+    if (!string)
+        return ''
+
+    const res = [...item.value.text.matchAll(/https?:\/\/[^\s]*/g)]
+    if (!res.length)
+        return string
+
+    res.forEach((item) => {
+        const text = item[0]
+        // const textLength = text.length
+        // const indexTextStart = item.index
+        // const indexTextEnd = indexTextStart + textLength
+        const linkElement = `<a href="${text}" target="_blank">${text}</a>`
+
+        string = string.replace(text, linkElement)
+    })
+
+    return string
+})
+
+// item.value.text = findLinks(item.value.text)
 </script>
 
 <template>
-    <q-card v-if="editMode === false" class="p-4 m-2.5 w-full md:w-80 flex flex-col">
+    <q-card
+        v-if="true/*editMode === false*/" class="
+        card p-4 m-2.5 flex flex-col overflow-hidden
+        !h-[unset] min-h-[90px]
+        min-w-[240px] w-full" :class="item.size === 2 ? 'md:max-w-full' : item.size === 1 ? 'md:max-w-[47%]' : 'md:max-w-80'"
+    >
         <h5 class="text-xl mb-3">
             {{ item.title }}
         </h5>
 
-        <div v-if="item.text" class="text-base sm:text-lg mb-2">
-            {{ item.text }}
-        </div>
+        <p v-if="item.text" class="text-lg break-words md:break-normal whitespace-pre-wrap mb-2 w-full w-[90%]" v-html="highlightedLinks" />
 
         <div class="flex flex-col mb-5">
             <q-checkbox
@@ -102,6 +174,7 @@ function removeItem() {
 
     <q-dialog v-model="editMode">
         <q-card>
+            <!-- :class="item.size === 2 ? 'w-full md:!max-w-full' : item.size === 1 ? 'md:!max-w-[47%]' : 'md:!max-w-80'" -->
             <q-card-section>
                 <q-input v-model="item.title" label="Заголовок" autofocus />
                 <q-input v-model="item.text" type="textarea" autogrow label="Описание" />
@@ -122,6 +195,23 @@ function removeItem() {
                         </button>
                     </div>
                 </div>
+            </q-card-section>
+
+            <q-card-section class="flex flex-col justify-center items-center overflow-hidden">
+                <q-badge>
+                    Размер окна
+                </q-badge>
+
+                <q-slider
+                    v-model="item.size"
+                    :min="0"
+                    :max="2"
+                    :step="1"
+                    snap
+                    label
+                    :label-value="itemSizeLabel"
+                    class="w-[90%] mx-auto"
+                />
             </q-card-section>
 
             <q-card-section>
@@ -178,6 +268,13 @@ function removeItem() {
     text-decoration: line-through;
     opacity: 0.6;
     user-select: none;
+}
+
+.q-card:deep(p > a) {
+    @apply text-blue
+}
+.q-card:deep(p > a:hover) {
+    @apply underline
 }
 
 /*.q-textarea.q-field--labeled:deep(.q-field__native) {
